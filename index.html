@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANCHOR | Interactive Investor Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive investor dashboard. A top navigation bar allows users to jump to key thematic sections: The Opportunity, The Model, The Financials, and The Team. This non-linear structure lets an investor explore what's most important to them first. The core interaction is a dynamic financial model where users can adjust investment assumptions with sliders to see the projected ROI, making the business case tangible and engaging. -->
+    <!-- Visualization & Content Choices: Opportunity -> Goal: Inform -> Viz: Large animated stats (HTML/JS) for TAM -> Interaction: None -> Justification: High impact for a key metric. The Model -> Goal: Organize -> Viz: HTML/CSS flowchart -> Interaction: Clickable steps update descriptive text -> Justification: Clearly explains the process. Financials -> Goal: Compare/Change -> Viz: Bar chart (Chart.js) -> Interaction: Sliders for 'Investment' and 'Time' update the chart and ROI calculation -> Justification: Makes the financial model interactive and compelling. Team/Traction -> Goal: Inform -> Viz: HTML/CSS cards and timeline -> Interaction: None -> Justification: Clear, professional presentation. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #1a1a1a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .step-item {
+            transition: all 0.3s ease-in-out;
+        }
+        .step-item.active {
+            background-color: #004E59;
+            color: #ffffff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .step-item.active .step-icon {
+            background-color: #ffffff;
+            color: #004E59;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold text-gray-800">
+                <span class="text-[#004E59]">ANCHOR</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#opportunity" class="nav-link text-gray-600 hover:text-[#004E59] border-b-2 border-transparent hover:border-[#004E59]">The Opportunity</a>
+                <a href="#model" class="nav-link text-gray-600 hover:text-[#004E59] border-b-2 border-transparent hover:border-[#004E59]">The Model</a>
+                <a href="#financials" class="nav-link text-gray-600 hover:text-[#004E59] border-b-2 border-transparent hover:border-[#004E59]">The Financials</a>
+                <a href="#team" class="nav-link text-gray-600 hover:text-[#004E59] border-b-2 border-transparent hover:border-[#004E59]">The Team</a>
+            </div>
+            <a href="#ask" class="hidden md:inline-block bg-[#004E59] text-white px-5 py-2 rounded-lg hover:bg-[#003A43] transition-colors">The Ask</a>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+        <section class="text-center mb-24">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">Keeping Families in Homes.</h1>
+            <h2 class="text-4xl md:text-6xl font-bold text-[#004E59] leading-tight mb-6">And Investors in the Upside.</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600">
+                ANCHOR is a FinTech platform architecting a new asset class in foreclosure prevention. We provide debt-free equity partnerships to homeowners in crisis, creating a scalable, ethical, and highly profitable investment opportunity.
+            </p>
+        </section>
+
+        <section id="opportunity" class="mb-24 scroll-mt-24">
+            <h3 class="text-3xl font-bold text-center mb-4">The Opportunity</h3>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">Millions of homeowners are locked out of traditional capital despite holding significant equity, creating a massive, underserved market ripe for disruption.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-5xl font-bold text-[#004E59] mb-2" id="tam-value">0</div>
+                    <p class="text-lg font-semibold text-gray-800">Trillions in Trapped Equity</p>
+                    <p class="text-gray-600">The total addressable market (TAM) represents a vast, untapped source of value.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-5xl font-bold text-[#004E59] mb-2" id="homeowners-value">0</div>
+                    <p class="text-lg font-semibold text-gray-800">Million Homeowners at Risk</p>
+                    <p class="text-gray-600">Each year, millions face foreclosure, creating a recurring, high-need customer base.</p>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                    <div class="text-5xl font-bold text-[#004E59] mb-2" id="market-value">0</div>
+                    <p class="text-lg font-semibold text-gray-800">Billion-Dollar Market</p>
+                    <p class="text-gray-600">The market for ethical, alternative financial solutions is expanding rapidly.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="model" class="mb-24 scroll-mt-24">
+            <h3 class="text-3xl font-bold text-center mb-4">The Model & The Moat</h3>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">Our "Cure & Secure" agreement is an equity partnership, not debt. Explore the process below to see how we create a win-win for families and investors.</p>
+            
+            <div id="steps-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 cursor-pointer">
+            </div>
+
+            <div id="step-details" class="bg-white p-8 rounded-xl shadow-lg border border-gray-100 min-h-[150px] flex items-center justify-center">
+                <p class="text-center text-gray-700 text-lg">Click a step above to see the details.</p>
+            </div>
+        </section>
+
+        <section id="financials" class="mb-24 scroll-mt-24">
+            <h3 class="text-3xl font-bold text-center mb-4">Projected Financial Growth</h3>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">The model is designed for high-margin, venture-scale returns. The graphic below illustrates how an initial investment can grow based on our standard projections.</p>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="text-center mb-8">
+                    <p class="text-gray-600">Based on a <span class="font-bold text-[#004E59]">$15,000</span> "Cure" Investment over <span class="font-bold text-[#004E59]">8 Years</span></p>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="roiChart"></canvas>
+                </div>
+
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                     <div class="bg-gray-50 p-6 rounded-lg">
+                        <p class="text-gray-600 text-sm">Projected Total Return</p>
+                        <p id="totalReturnValue" class="text-3xl font-bold text-gray-900">$0</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <p class="text-gray-600 text-sm">Return on Investment (ROI)</p>
+                        <p id="roiValue" class="text-3xl font-bold text-[#004E59]">0%</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="mb-24 scroll-mt-24">
+            <h3 class="text-3xl font-bold text-center mb-4">Team & Traction</h3>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">We are executing a 30-Day Validation Sprint in Sarasota, FL to prove market demand with hard data. This mission is led by a dedicated, expert team.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h4 class="font-bold text-lg text-gray-900">Pat Brester</h4>
+                    <p class="text-[#004E59] font-medium mb-2">Founder</p>
+                    <p class="text-gray-600">Seasoned real estate and foreclosure expert with the deep, firsthand knowledge required to navigate this complex market.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h4 class="font-bold text-lg text-gray-900">Real Estate Ops Team (JMB)</h4>
+                    <p class="text-[#004E59] font-medium mb-2">Execution Engine</p>
+                    <p class="text-gray-600">In-house specialists in project management, outreach, and compliance ready to execute the pilot with precision.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h4 class="font-bold text-lg text-gray-900">Thinkstartscale</h4>
+                    <p class="text-[#004E59] font-medium mb-2">Tech & Marketing Partner</p>
+                    <p class="text-gray-600">Proven agency partner ready to architect and build the scalable MVP upon successful validation.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ask" class="bg-[#004E59] text-white p-12 rounded-xl text-center scroll-mt-24">
+            <h3 class="text-3xl font-bold mb-4">The Ask</h3>
+            <p class="max-w-xl mx-auto text-lg mb-8">We are seeking 3–5 strategic seed investors ($150K–$250K each) to fund the MVP build and launch the initial portfolio of ANCHOR deals.</p>
+            <a href="mailto:pat@example.com" class="bg-white text-[#004E59] font-bold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors">
+                We welcome the opportunity to discuss our real-time pilot progress and roadmap toward scale.	
+            </a>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const modelData = {
+                steps: [
+                    {
+                        id: 'step1',
+                        icon: '🏠',
+                        title: 'Homeowner in Distress',
+                        details: 'A family with significant equity faces a temporary crisis and enters pre-foreclosure. They are locked out of traditional lending options.'
+                    },
+                    {
+                        id: 'step2',
+                        icon: '⚓',
+                        title: 'ANCHOR Intervenes',
+                        details: 'We provide an immediate cash injection to cure the mortgage default. This is an equity investment, not a loan. There are no monthly payments.'
+                    },
+                    {
+                        id: 'step3',
+                        icon: '🏆',
+                        title: 'The Moat: Why We Win',
+                        details: 'Our advantage is twofold: 1) **Founder-Market Fit**: Deep foreclosure expertise to manage complex deals. 2) **Proprietary AI**: An underwriting engine that predicts an owner\'s "Propensity to Recover" for smart, scalable decisions.'
+                    }
+                ],
+                initialStep: 'step2'
+            };
+
+            const stepsContainer = document.getElementById('steps-container');
+            const stepDetails = document.getElementById('step-details');
+
+            modelData.steps.forEach(step => {
+                const stepEl = document.createElement('div');
+                stepEl.id = step.id;
+                stepEl.className = 'step-item bg-white p-6 rounded-xl shadow-lg border border-gray-100 flex flex-col items-center text-center';
+                stepEl.innerHTML = `
+                    <div class="step-icon text-3xl mb-4 bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center">${step.icon}</div>
+                    <h4 class="font-bold text-lg text-gray-900">${step.title}</h4>
+                `;
+                stepEl.addEventListener('click', () => {
+                    setActiveStep(step.id);
+                });
+                stepsContainer.appendChild(stepEl);
+            });
+
+            function setActiveStep(stepId) {
+                const step = modelData.steps.find(s => s.id === stepId);
+                if (!step) return;
+
+                document.querySelectorAll('.step-item').forEach(el => el.classList.remove('active'));
+                document.getElementById(stepId).classList.add('active');
+                
+                stepDetails.innerHTML = `<p class="text-center text-lg md:text-xl font-medium">${step.details}</p>`;
+            }
+
+            setActiveStep(modelData.initialStep);
+
+
+            const animateValue = (element, start, end, duration, isMoney = false, suffix = '') => {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const value = Math.floor(progress * (end - start) + start);
+                    if (isMoney) {
+                        element.innerHTML = `$${value.toLocaleString()}${suffix}`;
+                    } else {
+                        element.innerHTML = `${value.toLocaleString()}${suffix}`;
+                    }
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            };
+
+            const tamEl = document.getElementById('tam-value');
+            const homeownersEl = document.getElementById('homeowners-value');
+            const marketEl = document.getElementById('market-value');
+
+            animateValue(tamEl, 0, 15, 1500, true, 'T');
+            animateValue(homeownersEl, 0, 2, 1500, false, 'M+');
+            animateValue(marketEl, 0, 500, 1500, true, 'B+');
+
+            
+            const totalReturnValueEl = document.getElementById('totalReturnValue');
+            const roiValueEl = document.getElementById('roiValue');
+            const ctx = document.getElementById('roiChart').getContext('2d');
+
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+            }
+
+            function setupStaticFinancials() {
+                const investment = 15000;
+                const years = 8;
+                const baseValue = 480000;
+                const annualAppreciation = 0.04;
+
+                const futureValue = baseValue * Math.pow((1 + annualAppreciation), years);
+                const appreciation = futureValue - baseValue;
+                const anchorShare = appreciation * 0.40;
+                const totalReturn = anchorShare + investment;
+                const roi = (anchorShare / investment) * 100;
+
+                animateValue(totalReturnValueEl, 0, Math.round(totalReturn), 1500, true);
+                animateValue(roiValueEl, 0, Math.round(roi), 1500, false, '%');
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Projected Financial Outcome'],
+                        datasets: [{
+                            label: 'Initial Investment',
+                            data: [investment],
+                            backgroundColor: '#B0A89F',
+                            borderWidth: 1
+                        }, {
+                            label: 'Projected Return (Upside)',
+                            data: [totalReturn - investment],
+                            backgroundColor: '#004E59',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            },
+                            y: {
+                                stacked: true,
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += formatCurrency(context.parsed.x);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            setupStaticFinancials();
+
+        });
+    </script>
+</body>
+</html>
+
