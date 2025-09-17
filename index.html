@@ -49,6 +49,19 @@
             background-color: #ffffff;
             color: #004E59;
         }
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .spinner {
+            border-top-color: #004E59;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -111,26 +124,38 @@
         </section>
 
         <section id="financials" class="mb-24 scroll-mt-24">
-            <h3 class="text-3xl font-bold text-center mb-4">Projected Financial Growth</h3>
-            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">The model is designed for high-margin, venture-scale returns. The graphic below illustrates how an initial investment can grow based on our standard projections.</p>
+            <h3 class="text-3xl font-bold text-center mb-4">Interactive Financial Model</h3>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">The model is designed for high-margin, venture-scale returns. Use the sliders below to see how an initial investment can grow based on our projections.</p>
             
             <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-                <div class="text-center mb-8">
-                    <p class="text-gray-600">Based on a <span class="font-bold text-[#004E59]">$15,000</span> "Cure" Investment over <span class="font-bold text-[#004E59]">8 Years</span></p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <label for="investmentSlider" class="block font-medium text-gray-700">Initial "Cure" Investment: <span id="investmentValue" class="font-bold text-[#004E59]">$15,000</span></label>
+                        <input id="investmentSlider" type="range" min="5000" max="50000" value="15000" step="1000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="timeSlider" class="block font-medium text-gray-700">Years to Property Sale: <span id="timeValue" class="font-bold text-[#004E59]">8 years</span></label>
+                        <input id="timeSlider" type="range" min="3" max="15" value="8" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
                 </div>
-                
+
                 <div class="chart-container">
                     <canvas id="roiChart"></canvas>
                 </div>
 
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                      <div class="bg-gray-50 p-6 rounded-lg">
                         <p class="text-gray-600 text-sm">Projected Total Return</p>
-                        <p id="totalReturnValue" class="text-3xl font-bold text-gray-900">$0</p>
+                        <p id="totalReturnValue" class="text-3xl font-bold text-gray-900">$105,370</p>
                     </div>
                     <div class="bg-gray-50 p-6 rounded-lg">
                         <p class="text-gray-600 text-sm">Return on Investment (ROI)</p>
-                        <p id="roiValue" class="text-3xl font-bold text-[#004E59]">0%</p>
+                        <p id="roiValue" class="text-3xl font-bold text-[#004E59]">590%</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg flex items-center justify-center">
+                         <button id="generateMemoBtn" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white font-bold px-6 py-3 rounded-lg hover:from-teal-600 hover:to-cyan-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                            Generate AI Deal Memo ✨
+                        </button>
                     </div>
                 </div>
             </div>
@@ -146,9 +171,9 @@
                     <p class="text-gray-600">Seasoned real estate and foreclosure expert with the deep, firsthand knowledge required to navigate this complex market.</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h4 class="font-bold text-lg text-gray-900">Real Estate Ops Team (JMB)</h4>
-                    <p class="text-[#004E59] font-medium mb-2">Execution Engine</p>
-                    <p class="text-gray-600">In-house specialists in project management, outreach, and compliance ready to execute the pilot with precision.</p>
+                    <h4 class="font-bold text-lg text-gray-900">Silvo Grijalva</h4>
+                    <p class="text-[#004E59] font-medium mb-2">Project Manager (JMB)</p>
+                    <p class="text-gray-600">Specialist in project management, outreach, and compliance, leading the Sarasota validation pilot and coordinating all operational efforts with precision.</p>
                 </div>
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                     <h4 class="font-bold text-lg text-gray-900">Thinkstartscale</h4>
@@ -161,11 +186,24 @@
         <section id="ask" class="bg-[#004E59] text-white p-12 rounded-xl text-center scroll-mt-24">
             <h3 class="text-3xl font-bold mb-4">The Ask</h3>
             <p class="max-w-xl mx-auto text-lg mb-8">We are seeking 3–5 strategic seed investors ($150K–$250K each) to fund the MVP build and launch the initial portfolio of ANCHOR deals.</p>
-            <a href="mailto:pat@example.com" class="bg-white text-[#004E59] font-bold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors">
-                We welcome the opportunity to discuss our real-time pilot progress and roadmap toward scale.	
+            <a href="mailto:pat@jmbmanagementtrustllc.com" class="bg-white text-[#004E59] font-bold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors">
+                Discuss Our Real-Time Pilot Progress.	
             </a>
         </section>
     </main>
+
+    <div id="memoModal" class="fixed inset-0 bg-black bg-opacity-50 modal-overlay flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl modal-content w-full max-w-2xl transform scale-95">
+            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-800">✨ AI-Generated Deal Memo</h3>
+                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <div class="p-8">
+                <div id="spinner" class="w-12 h-12 rounded-full border-4 border-gray-200 spinner mx-auto my-12 hidden"></div>
+                <div id="memoContent" class="text-gray-700 space-y-4"></div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -250,18 +288,27 @@
             animateValue(homeownersEl, 0, 2, 1500, false, 'M+');
             animateValue(marketEl, 0, 500, 1500, true, 'B+');
 
-            
+            const investmentSlider = document.getElementById('investmentSlider');
+            const timeSlider = document.getElementById('timeSlider');
+            const investmentValueEl = document.getElementById('investmentValue');
+            const timeValueEl = document.getElementById('timeValue');
             const totalReturnValueEl = document.getElementById('totalReturnValue');
             const roiValueEl = document.getElementById('roiValue');
+
             const ctx = document.getElementById('roiChart').getContext('2d');
+            let roiChart;
 
             function formatCurrency(value) {
                 return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
             }
 
-            function setupStaticFinancials() {
-                const investment = 15000;
-                const years = 8;
+            function updateFinancials() {
+                const investment = parseFloat(investmentSlider.value);
+                const years = parseInt(timeSlider.value);
+                
+                investmentValueEl.textContent = formatCurrency(investment);
+                timeValueEl.textContent = `${years} years`;
+                
                 const baseValue = 480000;
                 const annualAppreciation = 0.04;
 
@@ -271,70 +318,170 @@
                 const totalReturn = anchorShare + investment;
                 const roi = (anchorShare / investment) * 100;
 
-                animateValue(totalReturnValueEl, 0, Math.round(totalReturn), 1500, true);
-                animateValue(roiValueEl, 0, Math.round(roi), 1500, false, '%');
+                totalReturnValueEl.textContent = formatCurrency(totalReturn);
+                roiValueEl.textContent = `${Math.round(roi)}%`;
 
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Projected Financial Outcome'],
-                        datasets: [{
-                            label: 'Initial Investment',
-                            data: [investment],
-                            backgroundColor: '#B0A89F',
-                            borderWidth: 1
-                        }, {
-                            label: 'Projected Return (Upside)',
-                            data: [totalReturn - investment],
-                            backgroundColor: '#004E59',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                stacked: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return formatCurrency(value);
+                updateChart(investment, totalReturn);
+            }
+
+            function updateChart(investment, totalReturn) {
+                if (roiChart) {
+                    roiChart.data.datasets[0].data = [investment];
+                    roiChart.data.datasets[1].data = [totalReturn - investment];
+                    roiChart.update();
+                } else {
+                    roiChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Projected Financial Outcome'],
+                            datasets: [{
+                                label: 'Initial Investment',
+                                data: [investment],
+                                backgroundColor: '#B0A89F',
+                                borderWidth: 1
+                            }, {
+                                label: 'Projected Return (Upside)',
+                                data: [totalReturn - investment],
+                                backgroundColor: '#004E59',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return formatCurrency(value);
+                                        }
+                                    }
+                                },
+                                y: {
+                                    stacked: true,
+                                    grid: {
+                                        display: false
                                     }
                                 }
                             },
-                            y: {
-                                stacked: true,
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.x !== null) {
+                                                label += formatCurrency(context.parsed.x);
+                                            }
+                                            return label;
                                         }
-                                        if (context.parsed.x !== null) {
-                                            label += formatCurrency(context.parsed.x);
-                                        }
-                                        return label;
                                     }
                                 }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
-            
-            setupStaticFinancials();
 
+            investmentSlider.addEventListener('input', updateFinancials);
+            timeSlider.addEventListener('input', updateFinancials);
+
+            updateFinancials();
+
+            const memoModal = document.getElementById('memoModal');
+            const generateMemoBtn = document.getElementById('generateMemoBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const spinner = document.getElementById('spinner');
+            const memoContent = document.getElementById('memoContent');
+
+            generateMemoBtn.addEventListener('click', () => {
+                memoModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                memoContent.innerHTML = '';
+                spinner.classList.remove('hidden');
+                generateMemo();
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                memoModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+            
+            memoModal.addEventListener('click', (e) => {
+                if(e.target === memoModal) {
+                    memoModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            async function generateMemo() {
+                const investment = investmentValueEl.textContent;
+                const years = timeValueEl.textContent;
+                const totalReturn = totalReturnValueEl.textContent;
+                const roi = roiValueEl.textContent;
+
+                const userQuery = `You are a venture capital analyst. Write a concise, one-paragraph deal memo for your investment committee summarizing an investment in 'Anchor'. The investment is a ${investment} 'cure' payment for a home. The projected holding period is ${years}, with an estimated total return of ${totalReturn} and a ${roi} ROI. Highlight the strengths of this specific deal based on these numbers and the overall business model of preventing foreclosures through equity partnerships. Keep the tone professional and persuasive.`;
+                
+                const systemPrompt = "Act as a world-class financial analyst providing a concise, single-paragraph summary for an investment memo. The summary should be data-driven, persuasive, and highlight the key strengths of the investment opportunity.";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                try {
+                    const response = await fetchWithBackoff(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        memoContent.textContent = candidate.content.parts[0].text;
+                    } else {
+                        throw new Error('No content in API response.');
+                    }
+                } catch (error) {
+                    memoContent.textContent = "An error occurred while generating the memo. Please try again.";
+                } finally {
+                    spinner.classList.add('hidden');
+                }
+            }
+
+            async function fetchWithBackoff(url, options, retries = 3, delay = 1000) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok && response.status === 429 && retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                    }
+                    return response;
+                } catch (error) {
+                    if (retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithBackoff(url, options, retries - 1, delay * 2);
+                    }
+                    throw error;
+                }
+            }
         });
     </script>
 </body>
